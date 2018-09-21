@@ -1,0 +1,4 @@
+namespace: test
+serviceName: api
+servicePort: 8000
+targetPort: 8000
