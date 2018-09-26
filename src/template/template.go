@@ -2,18 +2,20 @@ package template
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"log"
+	"os"
+	"path"
+	"path/filepath"
 	"text/template"
 )
 
 type environment struct {
 	config interface{}
+	outputDir string
 }
 
-func ProcessTemplates(templateDir string, configFile string) {
-	env := environment{parseConfig(configFile)}
+func ProcessTemplates(templateDir string, configFile string, outputDir string) {
+	env := environment{parseConfig(configFile), outputDir}
 	err := filepath.Walk(templateDir, env.ProcessTemplate)
 	if err != nil {
 		fmt.Printf("Error processing template in directory: %v\n", err)
@@ -21,23 +23,31 @@ func ProcessTemplates(templateDir string, configFile string) {
 	}
 }
 
-func (env *environment) ProcessTemplate(path string, info os.FileInfo, err error) error {
+func (env *environment) ProcessTemplate(filePath string, info os.FileInfo, err error) error {
 	if err != nil {
-		fmt.Printf("Error accessing path %q: %v\n", path, err)
+		fmt.Printf("Error accessing filePath %q: %v\n", filePath, err)
 		return err
 	}
 
 	if !info.IsDir() {
-		fmt.Printf("Template to process: %q\n", path)
+		fmt.Printf("Template to process: %q\n", filePath)
 
-		t, err := template.ParseFiles(path)
+		t, err := template.ParseFiles(filePath)
 		if err != nil {
 			log.Print(err)
 			return err
 		}
 
-		//config := parseConfig(*configFile)
-		err = t.Execute(os.Stdout, env.config)
+		outputPath := env.outputDir + "/" + filePath
+		os.MkdirAll(path.Dir(outputPath), 0777)
+		file, err := os.Create(outputPath)
+
+		if err != nil {
+			log.Print(err)
+			return err
+		}
+
+		err = t.Execute(file, env.config)
 		if err != nil {
 			return err
 		}
