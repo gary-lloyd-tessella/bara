@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/gary-lloyd-tessella/bara/pkg/kubectl"
 	"github.com/gary-lloyd-tessella/bara/pkg/template"
 	log "github.com/sirupsen/logrus"
 	flag "gopkg.in/alecthomas/kingpin.v2"
 	"os"
-	"os/exec"
 )
 
 var (
@@ -24,6 +24,8 @@ func init() {
 	log.SetLevel(log.InfoLevel)
 }
 
+const outputDirectory string = ".bara"
+
 func main() {
 	flag.Version("0.0.1")
 	flag.CommandLine.HelpFlag.Short('h')
@@ -35,24 +37,9 @@ func main() {
 		log.Info("Dry run - Templates will no be applied")
 	}
 
-	outputDirectory := ".bara"
 	createOutputDirectory(outputDirectory)
 	template.ProcessTemplates(*templateDir, *configFile, outputDirectory)
-
-	kubectlPath, _ := exec.LookPath("kubectl")
-	log.Info(fmt.Sprintf("Using kubectl from path: %s", kubectlPath))
-
-	templateDirToExecute := outputDirectory + "/" + *templateDir
-	log.Info(fmt.Sprintf("Executing templates in directory: %s", templateDirToExecute))
-
-	cmd := exec.Command(kubectlPath, "apply", "-f", templateDirToExecute)
-	out, err := cmd.Output()
-
-	if err != nil {
-		// Log the error and continue as we want to apply all valid manifests
-		fmt.Println(string(err.(*exec.ExitError).Stderr))
-	}
-	log.Info(string(out))
+	kubectl.ApplyManifests(outputDirectory, *templateDir)
 }
 
 func createOutputDirectory(dirName string) bool {
