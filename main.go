@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gary-lloyd-tessella/bara/template"
+	"github.com/gary-lloyd-tessella/bara/pkg/template"
 	"fmt"
 	"github.com/fatih/color"
 	flag "gopkg.in/alecthomas/kingpin.v2"
