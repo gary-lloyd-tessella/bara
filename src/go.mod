@@ -11,4 +11,5 @@ require (
 	github.com/stretchr/testify v1.2.2 // indirect
 	golang.org/x/sys v0.0.0-20180920110915-d641721ec2de // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
+	gopkg.in/yaml.v2 v2.2.1
 )

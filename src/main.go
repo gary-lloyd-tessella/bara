@@ -1,11 +1,12 @@
 package main
 
 import (
+	"github.com/gary-lloyd-tessella/bara/template"
 	"fmt"
 	"github.com/fatih/color"
 	flag "gopkg.in/alecthomas/kingpin.v2"
-	"./template"
 	"os"
+	"os/exec"
 )
 
 var (
@@ -28,6 +29,21 @@ func main() {
 	outputDirectory := ".bara"
 	createOutputDirectory(outputDirectory)
 	template.ProcessTemplates(*templateDir, *configFile, outputDirectory)
+
+	kubectlPath, _ := exec.LookPath("kubectl")
+	fmt.Println(fmt.Sprintf("Using kubectl from path: %s", kubectlPath))
+
+	templateDirToExecute := outputDirectory + "/" + *templateDir
+	fmt.Println(templateDirToExecute)
+
+	cmd := exec.Command(kubectlPath, "apply", "-f", templateDirToExecute)
+	out, err := cmd.Output()
+
+	if err != nil {
+		// Log the error and continue as we want to apply all valid manifests
+		fmt.Println(string(err.(*exec.ExitError).Stderr))
+	}
+	fmt.Println(string(out))
 }
 
 func createOutputDirectory(dirName string) bool {
