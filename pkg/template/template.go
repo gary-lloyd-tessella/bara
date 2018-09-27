@@ -2,7 +2,7 @@ package template
 
 import (
 	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"path"
 	"path/filepath"
@@ -18,19 +18,19 @@ func ProcessTemplates(templateDir string, configFile string, outputDir string) {
 	env := environment{parseConfig(configFile), outputDir}
 	err := filepath.Walk(templateDir, env.ProcessTemplate)
 	if err != nil {
-		fmt.Printf("Error processing template in directory: %v\n", err)
+		log.Error(fmt.Sprintf("Error processing template in directory: %v\n", err))
 		return
 	}
 }
 
 func (env *environment) ProcessTemplate(filePath string, info os.FileInfo, err error) error {
 	if err != nil {
-		fmt.Printf("Error accessing filePath %q: %v\n", filePath, err)
+		log.Error(fmt.Sprintf("Error accessing filePath %q: %v\n", filePath, err))
 		return err
 	}
 
 	if !info.IsDir() {
-		fmt.Printf("Template to process: %q\n", filePath)
+		log.Info(fmt.Sprintf("Template to process: %q\n", filePath))
 
 		t, err := template.ParseFiles(filePath)
 		if err != nil {

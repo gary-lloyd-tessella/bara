@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/gary-lloyd-tessella/bara/pkg/template"
 	"fmt"
-	"github.com/fatih/color"
+	"github.com/gary-lloyd-tessella/bara/pkg/template"
+	log "github.com/sirupsen/logrus"
 	flag "gopkg.in/alecthomas/kingpin.v2"
 	"os"
 	"os/exec"
@@ -16,14 +16,23 @@ var (
 	dryrun      = flag.Flag("dryrun", "Build templates without applying to cluster").Short('r').Bool()
 )
 
+func init() {
+	// Log as JSON instead of the default ASCII formatter.
+	log.SetFormatter(&log.TextFormatter{})
+
+	// Only log the warning severity or above.
+	log.SetLevel(log.InfoLevel)
+}
+
 func main() {
 	flag.Version("0.0.1")
 	flag.CommandLine.HelpFlag.Short('h')
 	flag.Parse()
-	color.Blue("Using template directory: %s\n", *templateDir)
-	color.Blue("Using config: %s\n", *configFile)
+	log.Info(fmt.Sprintf("Using template directory: %s", *templateDir))
+	log.Info(fmt.Sprintf("Using config: %s\n", *configFile))
+
 	if *dryrun {
-		color.Yellow("Dry run - Templates will no be applied")
+		log.Info("Dry run - Templates will no be applied")
 	}
 
 	outputDirectory := ".bara"
@@ -31,10 +40,10 @@ func main() {
 	template.ProcessTemplates(*templateDir, *configFile, outputDirectory)
 
 	kubectlPath, _ := exec.LookPath("kubectl")
-	fmt.Println(fmt.Sprintf("Using kubectl from path: %s", kubectlPath))
+	log.Info(fmt.Sprintf("Using kubectl from path: %s", kubectlPath))
 
 	templateDirToExecute := outputDirectory + "/" + *templateDir
-	fmt.Println(templateDirToExecute)
+	log.Info(fmt.Sprintf("Executing templates in directory: %s", templateDirToExecute))
 
 	cmd := exec.Command(kubectlPath, "apply", "-f", templateDirToExecute)
 	out, err := cmd.Output()
@@ -43,7 +52,7 @@ func main() {
 		// Log the error and continue as we want to apply all valid manifests
 		fmt.Println(string(err.(*exec.ExitError).Stderr))
 	}
-	fmt.Println(string(out))
+	log.Info(string(out))
 }
 
 func createOutputDirectory(dirName string) bool {
@@ -56,12 +65,12 @@ func createOutputDirectory(dirName string) bool {
 		}
 		return true
 	} else {
-		fmt.Println("Clearing existing output directory")
+		log.Info("Clearing existing output directory")
 		os.Remove(dirName)
 	}
 
 	if src.Mode().IsRegular() {
-		fmt.Println(dirName, "already exist as a file!")
+		log.Info(fmt.Sprintf("%s already exist as a file!", dirName))
 		return false
 	}
 
