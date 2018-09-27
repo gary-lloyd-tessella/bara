@@ -1,4 +1,8 @@
-namespace: test
-serviceName: api
-servicePort: 8000
-targetPort: 8000
+namespace: default
+appName: api
+servicePort: 80
+targetPort: 80
+replicas: 2
+image:
+  name: nginx
+  version: 1.15-alpine
