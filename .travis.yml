@@ -5,15 +5,11 @@ go:
 
 script:
 - go test -v ./...
-- go build
 
 deploy:
-  provider: releases
-  api_key:
-    secure: B+10dOJSEKJ1DgK1kurHdvxpaD3j/XbvIFmeu8ZQ9qJOfuTWfsr4hGIn4c8Ts5LSsTIg738H3nlvHdMcDXqulOnKy5/Z2bAqqfR2zFtnoVfz7oz/qP7Jy8ZFaAgDgWYAuKpMPaTj7x+BjF0TyL0Nl8jyaLV6ONd84qxHlWm5WI5vggjW4ghLtppQWVb/UiahQj9Pug+72E7T2A+RStbR639HbRRaNdJm+MmGPFVZ7XqBCMGXpRH+qAuMuUol5qQnnEVELOfGrgAnjEjCpqExUzPiNkRefyFyhyds9IS2F+LmsxH/fWGFCnVPD9hkI5p2VzwTdfCh2NtAi1cPcRTJZmZgXci0BSftejMNrj7KDw5GmHGy87XKXj9IgUgqmk0mS0TJ7Mf4fnUGqK0H6cNF4mNQ4infy0MbCOlQEJ5SOh5aaTNBS5KBffwahqLvanqp+Sxln2ur7Kv3+8DHZB5W8oH62F68tu7h+SQh1WLIF/Pd5ojRndm2f6mlCL/uLsD2nKprYLaMDJvsw+hlSEoP14h1Ns2RL4hUFVsuI4u2XXIxX+dmlDVFse1GnxtRCxD7m5hDQVdt4+J6AWIzj1mdgjhN8RneimJqi3d2KiabI3NSu2q+gxZjTLI9WjCZFDYPeFCuX4+klIf4pvtE95DAtC/kGV063HHVhJhD7a1cBUs=
-  file: bara
+- provider: script
   skip_cleanup: true
+  script: curl -sL https://git.io/goreleaser | bash
   on:
-    repo: gary-lloyd-tessella/bara
-    branch: master
     tags: true
+    condition: $TRAVIS_OS_NAME = linux
