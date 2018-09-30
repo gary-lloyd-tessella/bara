@@ -8,12 +8,14 @@ import (
 	"path/filepath"
 )
 
+// KUBECTL constant for the kubectl command
 const KUBECTL string = "kubectl"
 
 type environment struct {
 	kubectlPath string
 }
 
+// ApplyManifests walks the specified directory applying the Kubernetes manifests
 func ApplyManifests(outputDirectory string, templateDir string) {
 	kubectlPath, _ := exec.LookPath(KUBECTL)
 	log.Info(fmt.Sprintf("Using kubectl from path: %s", kubectlPath))
@@ -22,10 +24,10 @@ func ApplyManifests(outputDirectory string, templateDir string) {
 	log.Info(fmt.Sprintf("Executing templates in directory: %s", templateDirToWalk))
 
 	env := environment{kubectlPath}
-	filepath.Walk(templateDirToWalk, env.ApplyManifest)
+	filepath.Walk(templateDirToWalk, env.applyManifest)
 }
 
-func (env *environment) ApplyManifest(filePath string, info os.FileInfo, err error) error {
+func (env *environment) applyManifest(filePath string, info os.FileInfo, err error) error {
 	if err != nil {
 		log.Error(fmt.Sprintf("Error accessing filePath %q: %v\n", filePath, err))
 		return err
