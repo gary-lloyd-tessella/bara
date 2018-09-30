@@ -4,7 +4,8 @@
 
 ## Goal
 
-To learn Go while building a micro service friendly Kubernetes deployment tool learning lessons from difficulties with Helm and Bara v1.
+To learn Go while building a micro service friendly Kubernetes deployment tool learning lessons from difficulties with
+Helm and Bara v1.
 
 Bara should:
 
@@ -21,3 +22,10 @@ Input information:
 *	Folder per environment
 *	Flexible hierarchy for services
 *	Leaf nodes are individual services if they contain the right files - metadata + values? or just values?
+
+## Release
+
+Bara is built using [Travis](https://travis-ci.org/gary-lloyd-tessella/bara) and packaged using 
+[Goreleaser](https://goreleaser.com/) with packages being published to
+[GitHub Releases](https://github.com/gary-lloyd-tessella/bara/releases). Travis is configured to build and test on
+every commit and will build and push a release for any annotated tags.
