@@ -10,7 +10,7 @@ import (
 )
 
 type environment struct {
-	config interface{}
+	config    interface{}
 	outputDir string
 }
 
