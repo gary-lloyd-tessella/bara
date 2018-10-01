@@ -51,10 +51,10 @@ func createOutputDirectory(dirName string) bool {
 			panic(fmt.Sprintf("Unable to create output direcory: %s", dirName))
 		}
 		return true
-	} else {
-		log.Info("Clearing existing output directory")
-		os.Remove(dirName)
 	}
+
+	log.Info("Clearing existing output directory")
+	os.Remove(dirName)
 
 	if src.Mode().IsRegular() {
 		log.Info(fmt.Sprintf("%s already exist as a file!", dirName))

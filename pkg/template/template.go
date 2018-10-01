@@ -10,20 +10,22 @@ import (
 )
 
 type environment struct {
-	config interface{}
+	config    interface{}
 	outputDir string
 }
 
+// ProcessTemplates finds all template files in the specified template directory and
+// compiles all of the templates into the output directory using the specified configuration
 func ProcessTemplates(templateDir string, configFile string, outputDir string) {
 	env := environment{parseConfig(configFile), outputDir}
-	err := filepath.Walk(templateDir, env.ProcessTemplate)
+	err := filepath.Walk(templateDir, env.processTemplate)
 	if err != nil {
 		log.Error(fmt.Sprintf("Error processing template in directory: %v\n", err))
 		return
 	}
 }
 
-func (env *environment) ProcessTemplate(filePath string, info os.FileInfo, err error) error {
+func (env *environment) processTemplate(filePath string, info os.FileInfo, err error) error {
 	if err != nil {
 		log.Error(fmt.Sprintf("Error accessing filePath %q: %v\n", filePath, err))
 		return err
