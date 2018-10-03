@@ -2,49 +2,33 @@ package kubectl
 
 import (
 	"fmt"
+	"github.com/gary-lloyd-tessella/bara/pkg/manifests"
 	log "github.com/sirupsen/logrus"
-	"os"
 	"os/exec"
-	"path/filepath"
 )
 
-// KUBECTL constant for the kubectl command
-const KUBECTL string = "kubectl"
-
-type environment struct {
-	kubectlPath string
-}
-
-// ApplyManifests walks the specified directory applying the Kubernetes manifests
-func ApplyManifests(outputDirectory string, templateDir string) {
-	kubectlPath, _ := exec.LookPath(KUBECTL)
+func ApplyManifests(outputDir string, manifests []manifests.Manifest) error {
+	kubectlPath, _ := exec.LookPath("kubectl")
 	log.Info(fmt.Sprintf("Using kubectl from path: %s", kubectlPath))
 
-	templateDirToWalk := outputDirectory + "/" + templateDir
-	log.Info(fmt.Sprintf("Executing templates in directory: %s", templateDirToWalk))
+	for _, manifest := range manifests {
+		evaluateTemplate(kubectlPath, outputDir, manifest)
+	}
 
-	env := environment{kubectlPath}
-	filepath.Walk(templateDirToWalk, env.applyManifest)
+	return nil
 }
 
-func (env *environment) applyManifest(filePath string, info os.FileInfo, err error) error {
+func evaluateTemplate(kubectlPath string, outputDirectory string, manifest manifests.Manifest) error {
+	log.Info(fmt.Sprintf("Applying Template: %q\n", manifest.Path))
+
+	cmd := exec.Command(kubectlPath, "apply", "-f", outputDirectory+"/"+manifest.Path)
+	out, err := cmd.Output()
+
 	if err != nil {
-		log.Error(fmt.Sprintf("Error accessing filePath %q: %v\n", filePath, err))
+		// Log the error and continue as we want to apply all valid manifests
+		fmt.Println(string(err.(*exec.ExitError).Stderr))
 		return err
 	}
-
-	if !info.IsDir() {
-		log.Info(fmt.Sprintf("Applying Template: %q\n", filePath))
-
-		cmd := exec.Command(env.kubectlPath, "apply", "-f", filePath)
-		out, err := cmd.Output()
-
-		if err != nil {
-			// Log the error and continue as we want to apply all valid manifests
-			fmt.Println(string(err.(*exec.ExitError).Stderr))
-		}
-		log.Info(fmt.Sprintf("Response: %s", string(out)))
-	}
-
+	log.Info(fmt.Sprintf("Response: %s", string(out)))
 	return nil
 }

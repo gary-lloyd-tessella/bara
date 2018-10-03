@@ -37,9 +37,10 @@ func main() {
 		log.Info("Dry run - Templates will no be applied")
 	}
 
+	releases := template.FindTemplates(*templateDir)
 	createOutputDirectory(outputDirectory)
-	template.ProcessTemplates(*templateDir, *configFile, outputDirectory)
-	kubectl.ApplyManifests(outputDirectory, *templateDir)
+	template.EvaluateTemplates(*configFile, outputDirectory, releases)
+	kubectl.ApplyManifests(outputDirectory, releases)
 }
 
 func createOutputDirectory(dirName string) bool {
