@@ -7,18 +7,19 @@ import (
 	"os/exec"
 )
 
+// ApplyManifests iterates over manifests applying them to the cluster
 func ApplyManifests(outputDir string, manifests []manifests.Manifest) error {
 	kubectlPath, _ := exec.LookPath("kubectl")
 	log.Info(fmt.Sprintf("Using kubectl from path: %s", kubectlPath))
 
 	for _, manifest := range manifests {
-		evaluateTemplate(kubectlPath, outputDir, manifest)
+		applyManifest(kubectlPath, outputDir, manifest)
 	}
 
 	return nil
 }
 
-func evaluateTemplate(kubectlPath string, outputDirectory string, manifest manifests.Manifest) error {
+func applyManifest(kubectlPath string, outputDirectory string, manifest manifests.Manifest) error {
 	log.Info(fmt.Sprintf("Applying Template: %q\n", manifest.Path))
 
 	cmd := exec.Command(kubectlPath, "apply", "-f", outputDirectory+"/"+manifest.Path)

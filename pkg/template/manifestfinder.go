@@ -15,7 +15,7 @@ type manifestFinder struct {
 	Manifests []manifests.Manifest
 }
 
-// ProcessTemplates finds all template files in the specified template directory and
+// FindTemplates finds all template files in the specified template directory and
 // compiles all of the templates into the output directory using the specified configuration
 func FindTemplates(templateDir string) []manifests.Manifest {
 	manifestFinder := manifestFinder{}
@@ -36,7 +36,7 @@ func (manifestFinder *manifestFinder) processTemplate(filePath string, info os.F
 
 	if !info.IsDir() {
 		log.Info(fmt.Sprintf("Template to process: %q\n", filePath))
-		manifestFinder.Manifests = append(manifestFinder.Manifests, manifests.Manifest{filePath})
+		manifestFinder.Manifests = append(manifestFinder.Manifests, manifests.Manifest{Path: filePath})
 	}
 
 	return nil

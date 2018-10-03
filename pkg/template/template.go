@@ -8,6 +8,7 @@ import (
 	"text/template"
 )
 
+// EvaluateTemplates iterates over the supplied templates evaluating them into the output directory
 func EvaluateTemplates(configFile string, outputDir string, manifests []manifests.Manifest) error {
 	config := parseConfig(configFile)
 
