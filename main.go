@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/gary-lloyd-tessella/bara/pkg/kubectl"
-	"github.com/gary-lloyd-tessella/bara/pkg/template"
+	"github.com/gary-lloyd-tessella/bara/pkg/service"
 	log "github.com/sirupsen/logrus"
 	flag "gopkg.in/alecthomas/kingpin.v2"
-	"os"
 )
 
 var (
@@ -37,30 +35,5 @@ func main() {
 		log.Info("Dry run - Templates will no be applied")
 	}
 
-	releases := template.FindTemplates(*templateDir)
-	createOutputDirectory(outputDirectory)
-	template.EvaluateTemplates(*configFile, outputDirectory, releases)
-	kubectl.ApplyManifests(outputDirectory, releases)
-}
-
-func createOutputDirectory(dirName string) bool {
-	src, err := os.Stat(dirName)
-
-	if os.IsNotExist(err) {
-		errDir := os.MkdirAll(dirName, 0755)
-		if errDir != nil {
-			panic(fmt.Sprintf("Unable to create output direcory: %s", dirName))
-		}
-		return true
-	}
-
-	log.Info("Clearing existing output directory")
-	os.Remove(dirName)
-
-	if src.Mode().IsRegular() {
-		log.Info(fmt.Sprintf("%s already exist as a file!", dirName))
-		return false
-	}
-
-	return false
+	service.Execute(*templateDir, *configFile, outputDirectory)
 }
